@@ -42,6 +42,9 @@ public class FormNew {
         mFrame = frame;
         browseLogButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                try {
+                    fileChooser.setCurrentDirectory(new File(fixTextField.getText()));
+                }catch (Exception ex){}
                 int retVal = fileChooser.showOpenDialog(mPanel);
                 if (retVal == JFileChooser.APPROVE_OPTION){
                     File file = fileChooser.getSelectedFile();
