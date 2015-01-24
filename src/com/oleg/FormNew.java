@@ -28,6 +28,7 @@ public class FormNew {
     private JTextField dividerTextField;
     private JButton browseDictButton;
     private JButton xButton;
+    private JTextField singleLineTextField;
 
     final MyTableModel tableModel = new MyTableModel();
     final DefaultListModel<Message> listModel = new DefaultListModel<Message>();
@@ -44,7 +45,17 @@ public class FormNew {
                 int retVal = fileChooser.showOpenDialog(mPanel);
                 if (retVal == JFileChooser.APPROVE_OPTION){
                     File file = fileChooser.getSelectedFile();
-                    fixTextField.setText(file.getAbsolutePath());
+                    String filePath = file.getAbsolutePath();
+                    fixTextField.setText(filePath);
+                    tableModel.clear();
+                    try {
+                        InputStream is;
+                        is = new FileInputStream(filePath);
+                        listModel.clear();
+                        readMessages(is);
+                    } catch (FileNotFoundException e1) {
+                        fixDictTextField.setText("File: " + filePath + " not found");
+                    }
                 }
             }
         });
@@ -63,18 +74,12 @@ public class FormNew {
 
         processButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String value = fixTextField.getText();
+                String value = singleLineTextField.getText();
                 if (value == null || value.trim().isEmpty())
                     return;
                 tableModel.clear();
-                InputStream is;
-                try {
-                    is = new FileInputStream(value);
-                    listModel.clear();
-                    readMessages(is);
-                } catch (FileNotFoundException e1) {
-                    listModel.addElement(new Message(value));
-                }
+                Message msg = new Message(value);
+                listModel.addElement(msg);
             }
         });
 
@@ -109,7 +114,7 @@ public class FormNew {
         xButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                fixTextField.setText("");
+                singleLineTextField.setText("");
             }
         });
     }
@@ -152,6 +157,7 @@ public class FormNew {
         listModel.addElement(new Message(testMessage));
         messagesList.setModel(listModel);
         messagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        messagesList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         dividerTextField.setText("\\u0001");
         fixDictTextField.setText("C:\\src\\FixViewer\\src\\FIX44.xml");
         fixDictTextField.setEnabled(false);
