@@ -16,6 +16,8 @@ import java.awt.event.ActionListener;
 import java.io.*;
 
 public class FormNew {
+    private static final String testMessage = "427=0\u00018=FIX.4.4\u00019=73\u000135=0\u000149=FXTRADE-QUOTE\u000156=CITIFX\u000134=27\u000152=20130509-21:04:01.388\u000157=FXSpot\u000110=139\u0001]\n";
+
     private JTextField fixTextField;
     private JButton browseLogButton;
     private JTextField fixDictTextField;
@@ -25,6 +27,7 @@ public class FormNew {
     private JList messagesList;
     private JTextField dividerTextField;
     private JButton browseDictButton;
+    private JButton xButton;
 
     final MyTableModel tableModel = new MyTableModel();
     final DefaultListModel<Message> listModel = new DefaultListModel<Message>();
@@ -60,8 +63,10 @@ public class FormNew {
 
         processButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                tableModel.clear();
                 String value = fixTextField.getText();
+                if (value == null || value.trim().isEmpty())
+                    return;
+                tableModel.clear();
                 InputStream is;
                 try {
                     is = new FileInputStream(value);
@@ -101,6 +106,12 @@ public class FormNew {
             }
         });
 
+        xButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fixTextField.setText("");
+            }
+        });
     }
 
     Node messages, fields;
@@ -133,18 +144,19 @@ public class FormNew {
 
 
     private void init(){
-        tableModel.addColumn("id");
-        tableModel.addColumn("name");
+        tableModel.addColumn("tag");
+        tableModel.addColumn("tag name");
+        tableModel.addColumn("value name");
         tableModel.addColumn("value");
-        tableModel.addColumn("valueName");
         fieldsTable.setModel(tableModel);
-        listModel.addElement(new Message("427=0\u00018=FIX.4.4\u00019=73\u000135=0\u000149=FXTRADE-QUOTE\u000156=CITIFX\u000134=27\u000152=20130509-21:04:01.388\u000157=FXSpot\u000110=139\u0001]\n"));
+        listModel.addElement(new Message(testMessage));
         messagesList.setModel(listModel);
         messagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         dividerTextField.setText("\\u0001");
         fixDictTextField.setText("C:\\src\\FixViewer\\src\\FIX44.xml");
         fixDictTextField.setEnabled(false);
-
+        fieldsTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
+        fieldsTable.getColumnModel().getColumn(0).setMaxWidth(40);
 
     }
 
