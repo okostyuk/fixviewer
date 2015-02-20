@@ -62,25 +62,27 @@ class MySwingWorker extends SwingWorker<ArrayList<Field>, Object> {
     }
 
     private String getValueName(String field, String value) {
-        Node node = getField(field);
-        NodeList nodes = node.getChildNodes();
-        Node valueNode;
-        NamedNodeMap attr;
-        for (int i=0; i<nodes.getLength(); i++){
-            valueNode = nodes.item(i);
-            attr = valueNode.getAttributes();
-            if (attr == null)
-                continue;
-            for (int j=0; j < attr.getLength(); j++){
-                try {
-                    if (attr.getNamedItem("enum").getNodeValue().equals(value)) {
-                        return attr.getNamedItem("description").getNodeValue();
-                    }
-                }catch (Exception ex){
+        try {
+            Node node = getField(field);
+            NodeList nodes = node.getChildNodes();
+            Node valueNode;
+            NamedNodeMap attr;
+            for (int i = 0; i < nodes.getLength(); i++) {
+                valueNode = nodes.item(i);
+                attr = valueNode.getAttributes();
+                if (attr == null)
+                    continue;
+                for (int j = 0; j < attr.getLength(); j++) {
+                    try {
+                        if (attr.getNamedItem("enum").getNodeValue().equals(value)) {
+                            return attr.getNamedItem("description").getNodeValue();
+                        }
+                    } catch (Exception ex) {
 
+                    }
                 }
             }
-        }
+        }catch (Exception ex){}
         return value;
     }
 
@@ -88,10 +90,12 @@ class MySwingWorker extends SwingWorker<ArrayList<Field>, Object> {
 
     String getFieldName(String id){
         String res = "unknown";
-        Node field = getField(id);
-        if (field != null){
-            res = field.getAttributes().getNamedItem("name").getNodeValue();
-        }
+        try {
+            Node field = getField(id);
+            if (field != null) {
+                res = field.getAttributes().getNamedItem("name").getNodeValue();
+            }
+        }catch (Exception ex){}
         return res;
     }
 
