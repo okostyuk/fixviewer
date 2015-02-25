@@ -10,15 +10,15 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
+import java.util.Properties;
 
 public class FormNew {
     private static final String testMessage = "427=0\u00018=FIX.4.4\u00019=73\u000135=0\u000149=FXTRADE-QUOTE\u000156=CITIFX\u000134=27\u000152=20130509-21:04:01.388\u000157=FXSpot\u000110=139\u0001]\n";
 
-    private JTextField fixTextField;
+    private JTextField logfileTextfield;
     private JButton browseLogButton;
     private JTextField fixDictTextField;
     private JButton processButton;
@@ -43,13 +43,18 @@ public class FormNew {
         browseLogButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    fileChooser.setCurrentDirectory(new File(fixTextField.getText()));
+                    fileChooser.setCurrentDirectory(new File(logfileTextfield.getText()));
                 }catch (Exception ex){}
                 int retVal = fileChooser.showOpenDialog(mPanel);
                 if (retVal == JFileChooser.APPROVE_OPTION){
                     File file = fileChooser.getSelectedFile();
                     String filePath = file.getAbsolutePath();
-                    fixTextField.setText(filePath);
+
+                    Properties p = loadProperties();
+                    p.setProperty("logfile", file.getAbsolutePath());
+                    saveProperties(p);
+
+                    logfileTextfield.setText(filePath);
                     tableModel.clear();
                     try {
                         InputStream is;
@@ -71,6 +76,9 @@ public class FormNew {
                     messages = null;
                     File file = fileChooser.getSelectedFile();
                     fixDictTextField.setText(file.getAbsolutePath());
+                    Properties p = loadProperties();
+                    p.setProperty("dictionary", file.getAbsolutePath());
+                    saveProperties(p);
                 }
             }
         });
@@ -83,6 +91,8 @@ public class FormNew {
                 tableModel.clear();
                 Message msg = new Message(value);
                 listModel.addElement(msg);
+                messagesList.setSelectedIndex(listModel.size()-1);
+                messagesList.ensureIndexIsVisible(listModel.size() - 1);
             }
         });
 
@@ -150,8 +160,29 @@ public class FormNew {
         frame.setVisible(true);
     }
 
+    private Properties loadProperties(){
+        Properties properties = new Properties();
+        try {
+            properties.load(new FileReader("fixviewer.properties"));
+        }catch (Exception ex){
+            properties.setProperty("divider", "\\u0001");
+            properties.setProperty("dictionary", "FIX44.xml");
+            properties.setProperty("logfile", "C:\\a2b\\a2b.1112.derivatives.actforex.asd\\log\\derivativesRates.log");
+            saveProperties(properties);
+        }
+        return properties;
+    }
+
+    private void saveProperties(Properties properties){
+        try {
+            FileWriter fw = new FileWriter("fixviewer.properties");
+            properties.store(fw, "test comment");
+        }catch (Exception ex){}
+    }
+
 
     private void init(){
+        Properties properties = loadProperties();
         tableModel.addColumn("tag");
         tableModel.addColumn("tag name");
         tableModel.addColumn("value name");
@@ -161,8 +192,9 @@ public class FormNew {
         messagesList.setModel(listModel);
         messagesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         messagesList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
-        dividerTextField.setText("\\u0001");
-        fixDictTextField.setText("C:\\src\\FixViewer\\src\\FIX44.xml");
+        dividerTextField.setText(properties.getProperty("divider"));
+        fixDictTextField.setText(properties.getProperty("dictionary"));
+        logfileTextfield.setText(properties.getProperty("logfile"));
         fixDictTextField.setEnabled(false);
         fieldsTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
         fieldsTable.getColumnModel().getColumn(0).setMaxWidth(40);
