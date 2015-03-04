@@ -18,7 +18,7 @@ import java.util.Properties;
 public class FormNew {
     private static final String testMessage = "427=0\u00018=FIX.4.4\u00019=73\u000135=0\u000149=FXTRADE-QUOTE\u000156=CITIFX\u000134=27\u000152=20130509-21:04:01.388\u000157=FXSpot\u000110=139\u0001]\n";
 
-    private JTextField logfileTextfield;
+    private JTextField fixTextField;
     private JButton browseLogButton;
     private JTextField fixDictTextField;
     private JButton processButton;
@@ -43,7 +43,7 @@ public class FormNew {
         browseLogButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    fileChooser.setCurrentDirectory(new File(logfileTextfield.getText()));
+                    fileChooser.setCurrentDirectory(new File(fixTextField.getText()));
                 }catch (Exception ex){}
                 int retVal = fileChooser.showOpenDialog(mPanel);
                 if (retVal == JFileChooser.APPROVE_OPTION){
@@ -54,7 +54,7 @@ public class FormNew {
                     p.setProperty("logfile", file.getAbsolutePath());
                     saveProperties(p);
 
-                    logfileTextfield.setText(filePath);
+                    fixTextField.setText(filePath);
                     tableModel.clear();
                     try {
                         InputStream is;
@@ -194,7 +194,7 @@ public class FormNew {
         messagesList.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         dividerTextField.setText(properties.getProperty("divider"));
         fixDictTextField.setText(properties.getProperty("dictionary"));
-        logfileTextfield.setText(properties.getProperty("logfile"));
+        fixTextField.setText(properties.getProperty("logfile"));
         fixDictTextField.setEnabled(false);
         fieldsTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);
         fieldsTable.getColumnModel().getColumn(0).setMaxWidth(40);
